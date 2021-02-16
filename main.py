@@ -5,6 +5,7 @@ ICA #3
 
 @author: Tomas Perez
 """
+import queue
 from queue import Queue
 
 totalNodesVisited = 0
@@ -13,8 +14,10 @@ start_position = [0, 1]
 end_position = [11, 11]
 rows, cols = (11, 11)
 visited = [[False] * cols] * rows
-row_queue = Queue
-column_queue = Queue
+row_queue = queue.Queue()
+column_queue = queue.Queue()
+dr = [-1, 1, 0, 0]
+dc = [0, 0, 1, -1]
 
 
 def print_maze(user_maze):
@@ -33,21 +36,26 @@ def bfs():
     # cell = maze[row][column]
     visited[start_position[0]][start_position[1]] = True
     while solution.qsize() > 0:
-        temp_path = solution.get()
+        temp_path = solution.get()  # updates the size in order to exit while loop
         row = row_queue.get()
         column = column_queue.get()
-        current_position = (row, column)
-        #FIXME: Debating on whether or not to use explore neighbours...
-        for j in ["L", "R", "U", "D"]:
-            put = temp_path + j
-            if reachable(current_position, put):
-                if visited[current_position[0]][current_position[1]] is not True:
-                    solution.put(put)
+        current_position = [row, column]
+        # FIXME: Debating on whether or not to use explore neighbours...
+        for i in range(4):
+            rr = current_position[0] + dr[i]
+            cc = current_position[1] + dc[i]
+            new_rc = (rr, cc)
+            for j in ["L", "R", "U", "D"]:
+                put = temp_path + j
+                if reachable(new_rc, put):
+                    if visited[rr][cc] is not True:
+                        solution.put(put)
+                        visited[rr][cc] = True
+
+                row_queue.put(rr)
+                column_queue.put(cc)
+    print(solution)
     return solution
-
-
-def update_current_pos(direction):
-    if direction ==
 
 
 # def find_end(coordinates, moves):
