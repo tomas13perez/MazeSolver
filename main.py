@@ -13,11 +13,16 @@ fastestRoute = []
 start_position = [0, 1]
 end_position = [11, 11]
 rows, cols = (11, 11)
-visited = [[False] * cols] * rows
+# visited = [[False] * cols] * rows
+visited = [[False for i in range(11)] for j in range(11)]
 row_queue = queue.Queue()
 column_queue = queue.Queue()
-dr = [-1, 1, 0, 0]
-dc = [0, 0, 1, -1]
+
+
+# dr = [0, -1, +1, 0]
+# dc = [-1, 0, 0, +1]
+# dr = [-1, +1, 0, 0]
+# dc = [0, 0, +1, -1]
 
 
 def print_maze(user_maze):
@@ -34,28 +39,58 @@ def bfs():
     solution.put("")
     found_the_end = False
     # cell = maze[row][column]
-    visited[start_position[0]][start_position[1]] = True
-    while solution.qsize() > 0:
+    # visited[start_position[0]][start_position[1]] = True
+    while row_queue.qsize() > 0:
+        i = 0
         temp_path = solution.get()  # updates the size in order to exit while loop
         row = row_queue.get()
         column = column_queue.get()
         current_position = [row, column]
-        # FIXME: Debating on whether or not to use explore neighbours...
-        for i in range(4):
-            rr = current_position[0] + dr[i]
-            cc = current_position[1] + dc[i]
-            new_rc = (rr, cc)
-            for j in ["L", "R", "U", "D"]:
-                put = temp_path + j
-                if reachable(new_rc, put):
-                    if visited[rr][cc] is not True:
-                        solution.put(put)
-                        visited[rr][cc] = True
+        if current_position[0] == end_position[0] and current_position[1] == end_position[1]:
+            return True
+        for j in ["L", "R", "U", "D"]:
+            temp = maze[current_position[0]][current_position[1]]
+            put = temp_path + j
+            if reachable(current_position, j):
+                if is_visited(current_position[0], current_position[1], j) is not True:
+                    solution.put(put)
+                    visited[current_position[0]][current_position[1]] = True
+                    rr, cc = update_pos(current_position[0], current_position[1], j)
+                    current_position[0] = rr
+                    current_position[1] = cc
+                    row_queue.put(current_position[0])
+                    column_queue.put(current_position[1])
+                    i += 1
 
-                row_queue.put(rr)
-                column_queue.put(cc)
-    print(solution)
-    return solution
+    return False
+
+
+def update_pos(r, c, direction):
+    if direction == "U":
+        r -= 1
+    elif direction == "D":
+        r += 1
+    elif direction == "L":
+        c -= 1
+    elif direction == "R":
+        c += 1
+    return r, c
+
+
+def is_visited(r, c, direction):
+    if direction == "U":
+        if visited[r - 1][c] is True:
+            return True
+    elif direction == "D":
+        if visited[r + 1][c] is True:
+            return True
+    elif direction == "L":
+        if visited[r][c - 1] is True:
+            return True
+    elif direction == "R":
+        if visited[r][c + 1] is True:
+            return True
+    return False
 
 
 # def find_end(coordinates, moves):
@@ -132,9 +167,9 @@ maze = [[" |", "¯|", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "�
         [" |", "  ", "  ", "  ", "  ", " |", " |", "  ", "  ", " |", " |"],
         [" |", "  ", "  ", "  ", "  ", " |", " |", "  ", "  ", " |", " |"],
         ["¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ "]]
-
 print_maze(maze)
-bfs()
+myBoolean = bfs()
+print(myBoolean)
 
 print()
 print()
