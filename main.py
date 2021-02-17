@@ -34,38 +34,34 @@ def print_maze(user_maze):
 def bfs():
     row_queue.put(start_position[0])
     column_queue.put(start_position[1])
-    solution = Queue()
+    solution = queue.Queue()
     solution.put("")
     found_the_end = False
-    temp_solution = ""
-
     # cell = maze[row][column]
     # visited[start_position[0]][start_position[1]] = True
     while row_queue.qsize() > 0:
-        i = 0
-        #temp_path = solution.get()  # updates the size in order to exit while loop
+        temp_path = solution.get()  # updates the size in order to exit while loop
         row = row_queue.get()
         column = column_queue.get()
         current_position = [row, column]
-        if current_position[0] == end_position[0] and current_position[1] == end_position[1]:
+        if current_position[0] == 11 and current_position[1] == 11:
             found_the_end = True
             return found_the_end
         for j in ["L", "R", "U", "D"]:
             temp = maze[current_position[0]][current_position[1]]
-            # put = temp_path + j
+            put = temp_path + j
 
             if reachable(current_position, j):
                 if is_visited(current_position[0], current_position[1], j) is not True:
-                    solution.put(j)
+                    solution.put(put)
                     visited[current_position[0]][current_position[1]] = True
                     rr, cc = update_pos(current_position[0], current_position[1], j)
                     current_position[0] = rr
                     current_position[1] = cc
                     row_queue.put(current_position[0])
                     column_queue.put(current_position[1])
-                    temp_solution += j
-                    i += 1
-    print(temp_solution)
+    print(list(solution.queue))
+
     return found_the_end
 
 
