@@ -12,8 +12,7 @@ totalNodesVisited = 0
 fastestRoute = []
 start_position = [0, 1]
 end_position = [11, 11]
-rows, cols = (11, 11)
-# visited = [[False] * cols] * rows
+# rows, cols = (11, 11)
 visited = [[False for i in range(11)] for j in range(11)]
 row_queue = queue.Queue()
 column_queue = queue.Queue()
@@ -38,11 +37,13 @@ def bfs():
     solution = Queue()
     solution.put("")
     found_the_end = False
+    temp_solution = ""
+
     # cell = maze[row][column]
     # visited[start_position[0]][start_position[1]] = True
-    while solution.qsize() > 0:
+    while row_queue.qsize() > 0:
         i = 0
-        temp_path = solution.get()  # updates the size in order to exit while loop
+        #temp_path = solution.get()  # updates the size in order to exit while loop
         row = row_queue.get()
         column = column_queue.get()
         current_position = [row, column]
@@ -51,18 +52,20 @@ def bfs():
             return found_the_end
         for j in ["L", "R", "U", "D"]:
             temp = maze[current_position[0]][current_position[1]]
-            put = temp_path + j
+            # put = temp_path + j
+
             if reachable(current_position, j):
                 if is_visited(current_position[0], current_position[1], j) is not True:
-                    solution.put(put)
+                    solution.put(j)
                     visited[current_position[0]][current_position[1]] = True
                     rr, cc = update_pos(current_position[0], current_position[1], j)
                     current_position[0] = rr
                     current_position[1] = cc
                     row_queue.put(current_position[0])
                     column_queue.put(current_position[1])
+                    temp_solution += j
                     i += 1
-
+    print(temp_solution)
     return found_the_end
 
 
