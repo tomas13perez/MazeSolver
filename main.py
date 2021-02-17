@@ -7,12 +7,15 @@ ICA #3
 """
 import queue
 from queue import Queue
+from queue import LifoQueue
 
 start_position = [0, 1]
 end_position = [11, 11]
 visited = [[False for i in range(11)] for j in range(11)]
 row_queue = queue.Queue()
 column_queue = queue.Queue()
+stack_row_queue = LifoQueue
+stack_column_queue = LifoQueue
 
 """
 This method is responsible for wiping the global variables
@@ -86,6 +89,14 @@ def bfs(end_row, end_column):
                     column_queue.put(cc)
 
     return found_the_end, optimal_solution, total_nodes_visited
+
+
+# might need recursion for this...
+def dfs(current_node, end_row, end_column):
+    if current_node[0] == end_row and current_node[1] == end_column:
+        return False
+
+    return False
 
 
 """
@@ -196,6 +207,7 @@ else:
 
 print()
 wipe_table()
+myBoolean, path, num_of_nodes = dfs(start_position, 9, 10)
 print()
 
 """ Dr. Kolta's Maze """
