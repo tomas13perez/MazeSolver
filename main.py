@@ -14,8 +14,8 @@ end_position = [11, 11]
 visited = [[False for i in range(11)] for j in range(11)]
 row_queue = queue.Queue()
 column_queue = queue.Queue()
-stack_row_queue = LifoQueue
-stack_column_queue = LifoQueue
+stack_row_queue = []
+stack_column_queue = []
 
 """
 This method is responsible for wiping the global variables
@@ -108,15 +108,14 @@ def bfs(end_row, end_column):
 def dfs(end_row, end_column):
     total_nodes_visited = 0
     optimal_solution = ""
-    row_queue.put(start_position[0])
-    column_queue.put(start_position[1])
-    solution = queue.Queue()
-    solution.put("")
+    stack_row_queue.append(start_position[0])
+    stack_column_queue.append(start_position[1])
+    solution = [""]
     found_the_end = False
-    while row_queue.qsize() > 0:
-        temp_path = solution.get()
-        row = row_queue.get()
-        column = column_queue.get()
+    while stack_row_queue.__sizeof__() > 0:
+        temp_path = solution.pop()
+        row = stack_row_queue.pop()
+        column = stack_column_queue.pop()
         current_position = [row, column]
         if current_position[0] == end_row and current_position[1] == end_column:
             found_the_end = True
@@ -126,12 +125,18 @@ def dfs(end_row, end_column):
             put = temp_path + j
             while reachable(current_position, j):
                 if is_visited(current_position[0], current_position[1], j) is not True:
-                    solution.put(put)
+                    solution.append(put)
                     visited[current_position[0]][current_position[1]] = True
                     total_nodes_visited += 1
                     rr, cc = update_pos(current_position[0], current_position[1], j)
-                    row_queue.put(rr)
-                    column_queue.put(cc)
+                    if rr == end_row and cc == end_column:
+                        found_the_end = True
+                        optimal_solution = temp_path
+                        return found_the_end, optimal_solution, total_nodes_visited
+                    current_position[0] = rr
+                    current_position[1] = cc
+                    stack_row_queue.append(current_position[0])
+                    stack_column_queue.append(current_position[1])
 
     return found_the_end, optimal_solution, total_nodes_visited
 
