@@ -40,14 +40,15 @@ def bfs():
     found_the_end = False
     # cell = maze[row][column]
     # visited[start_position[0]][start_position[1]] = True
-    while row_queue.qsize() > 0:
+    while solution.qsize() > 0:
         i = 0
         temp_path = solution.get()  # updates the size in order to exit while loop
         row = row_queue.get()
         column = column_queue.get()
         current_position = [row, column]
         if current_position[0] == end_position[0] and current_position[1] == end_position[1]:
-            return True
+            found_the_end = True
+            return found_the_end
         for j in ["L", "R", "U", "D"]:
             temp = maze[current_position[0]][current_position[1]]
             put = temp_path + j
@@ -62,7 +63,7 @@ def bfs():
                     column_queue.put(current_position[1])
                     i += 1
 
-    return False
+    return found_the_end
 
 
 def update_pos(r, c, direction):
