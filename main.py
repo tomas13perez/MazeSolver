@@ -12,7 +12,6 @@ totalNodesVisited = 0
 fastestRoute = []
 start_position = [0, 1]
 end_position = [11, 11]
-# rows, cols = (11, 11)
 visited = [[False for i in range(11)] for j in range(11)]
 row_queue = queue.Queue()
 column_queue = queue.Queue()
@@ -23,6 +22,20 @@ column_queue = queue.Queue()
 # dr = [-1, +1, 0, 0]
 # dc = [0, 0, +1, -1]
 
+def wipe_table():
+    global totalNodesVisited
+    totalNodesVisited = 0
+    global fastestRoute
+    fastestRoute = []
+    global start_position
+    start_position = [0, 1]
+    global visited
+    visited = [[False for i in range(11)] for j in range(11)]
+    global row_queue
+    row_queue = queue.Queue()
+    global column_queue
+    column_queue = queue.Queue()
+
 
 def print_maze(user_maze):
     for row in user_maze:
@@ -31,20 +44,18 @@ def print_maze(user_maze):
         print('')
 
 
-def bfs():
+def bfs(end_row, end_column):
     row_queue.put(start_position[0])
     column_queue.put(start_position[1])
     solution = queue.Queue()
     solution.put("")
     found_the_end = False
-    # cell = maze[row][column]
-    # visited[start_position[0]][start_position[1]] = True
     while row_queue.qsize() > 0:
-        temp_path = solution.get()  # updates the size in order to exit while loop
+        temp_path = solution.get()
         row = row_queue.get()
         column = column_queue.get()
         current_position = [row, column]
-        if current_position[0] == 9 and current_position[1] == 10:
+        if current_position[0] == end_row and current_position[1] == end_column:
             found_the_end = True
             return found_the_end
         for j in ["L", "R", "U", "D"]:
@@ -138,10 +149,11 @@ maze = [[" |", "¯|", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "�
         [" |", "  ", "  ", "  ", "  ", " |", " |", "  ", "  ", " |", " |"],
         ["¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ "]]
 print_maze(maze)
-# myBoolean = bfs()
-# print(myBoolean)
+myBoolean = bfs(9, 10)
+print(myBoolean)
 
 print()
+wipe_table()
 print()
 
 """ Dr. Kolta's Maze """
@@ -159,5 +171,5 @@ maze = [[" |", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "�
         ["¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ "]]
 
 print_maze(maze)
-myBoolean = bfs()
+myBoolean = bfs(9, 10)
 print(myBoolean)
