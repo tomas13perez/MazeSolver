@@ -44,22 +44,19 @@ def bfs():
         row = row_queue.get()
         column = column_queue.get()
         current_position = [row, column]
-        if current_position[0] == 11 and current_position[1] == 11:
+        if current_position[0] == 9 and current_position[1] == 10:
             found_the_end = True
             return found_the_end
         for j in ["L", "R", "U", "D"]:
             temp = maze[current_position[0]][current_position[1]]
             put = temp_path + j
-
             if reachable(current_position, j):
                 if is_visited(current_position[0], current_position[1], j) is not True:
                     solution.put(put)
                     visited[current_position[0]][current_position[1]] = True
                     rr, cc = update_pos(current_position[0], current_position[1], j)
-                    current_position[0] = rr
-                    current_position[1] = cc
-                    row_queue.put(current_position[0])
-                    column_queue.put(current_position[1])
+                    row_queue.put(rr)
+                    column_queue.put(cc)
     print(list(solution.queue))
 
     return found_the_end
@@ -91,33 +88,6 @@ def is_visited(r, c, direction):
         if visited[r][c + 1] is True:
             return True
     return False
-
-
-# def find_end(coordinates, moves):
-#     start_row = coordinates[0]
-#     start_column = coordinates[1]
-#     for move in moves:
-#         if move == "L":
-#             i -= 1
-#         elif move == "R":
-#             i += 1
-#         elif move == "U":
-#             j -= 1
-#         elif move == "D":
-#             j += 1
-#     if i == 11 and j == 11:
-#         print("Found: " + moves)
-#         # print_Solution(maze, moves)
-#         return True
-#     return False
-
-
-# def print_Solution(maze, moves):
-#     i = 0;
-#     j = 0;
-#     pos = set()
-#     for move in path:
-#         if move ==
 
 
 """ This is ICA 6 """
@@ -168,8 +138,8 @@ maze = [[" |", "¯|", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "�
         [" |", "  ", "  ", "  ", "  ", " |", " |", "  ", "  ", " |", " |"],
         ["¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ "]]
 print_maze(maze)
-myBoolean = bfs()
-print(myBoolean)
+# myBoolean = bfs()
+# print(myBoolean)
 
 print()
 print()
@@ -189,4 +159,5 @@ maze = [[" |", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "�
         ["¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ "]]
 
 print_maze(maze)
-# bfs(maze)
+myBoolean = bfs()
+print(myBoolean)
