@@ -8,25 +8,19 @@ ICA #3
 import queue
 from queue import Queue
 
-totalNodesVisited = 0
-fastestRoute = []
 start_position = [0, 1]
 end_position = [11, 11]
 visited = [[False for i in range(11)] for j in range(11)]
 row_queue = queue.Queue()
 column_queue = queue.Queue()
 
+"""
+This method is responsible for wiping the global variables
+and prepping them for the next iteration of maze solver.
+"""
 
-# dr = [0, -1, +1, 0]
-# dc = [-1, 0, 0, +1]
-# dr = [-1, +1, 0, 0]
-# dc = [0, 0, +1, -1]
 
 def wipe_table():
-    global totalNodesVisited
-    totalNodesVisited = 0
-    global fastestRoute
-    fastestRoute = []
     global start_position
     start_position = [0, 1]
     global visited
@@ -37,6 +31,12 @@ def wipe_table():
     column_queue = queue.Queue()
 
 
+"""
+This method prints the given maze to the console.
+@user_maze:param - the maze the user wants to print.
+"""
+
+
 def print_maze(user_maze):
     for row in user_maze:
         for c in row:
@@ -44,7 +44,22 @@ def print_maze(user_maze):
         print('')
 
 
+"""
+This method implements the Breadth First Search algorithm by
+keeping track of the current queue of cells that need to
+be searched through, while also keeping track of the most
+optimal path as well as the total amount of nodes searched in.
+@end_row:param - the end row number.
+@end_column:param - the end column number.
+@:returns - True if there is a solution to the maze, False if not,
+            the optimal solution, and the total number of nodes 
+            searched through.
+"""
+
+
 def bfs(end_row, end_column):
+    total_nodes_visited = 0
+    optimal_solution = ""
     row_queue.put(start_position[0])
     column_queue.put(start_position[1])
     solution = queue.Queue()
@@ -57,20 +72,32 @@ def bfs(end_row, end_column):
         current_position = [row, column]
         if current_position[0] == end_row and current_position[1] == end_column:
             found_the_end = True
-            return found_the_end
+            optimal_solution = temp_path
+            return found_the_end, optimal_solution, total_nodes_visited
         for j in ["L", "R", "U", "D"]:
-            temp = maze[current_position[0]][current_position[1]]
             put = temp_path + j
             if reachable(current_position, j):
                 if is_visited(current_position[0], current_position[1], j) is not True:
                     solution.put(put)
                     visited[current_position[0]][current_position[1]] = True
+                    total_nodes_visited += 1
                     rr, cc = update_pos(current_position[0], current_position[1], j)
                     row_queue.put(rr)
                     column_queue.put(cc)
-    print(list(solution.queue))
 
-    return found_the_end
+    return found_the_end, optimal_solution, total_nodes_visited
+
+
+"""
+This method updates the given row or column value based off 
+of the direction being passed in, for the next iteration
+of search.
+@r:param - the row number for the cell.
+@c:param - the column number for the cell.
+@direction:param - the direction the cell wants to go,
+            in the format of 'U', 'D', 'L', 'R'.
+@:returns - True if the cell has been visited, False if not.
+"""
 
 
 def update_pos(r, c, direction):
@@ -83,6 +110,17 @@ def update_pos(r, c, direction):
     elif direction == "R":
         c += 1
     return r, c
+
+
+"""
+This method checks to see if a given coordinate (cell) and direction
+has been visited previously in the search.
+@r:param - the row number for the cell.
+@c:param - the column number for the cell.
+@direction:param - the direction the cell wants to go,
+            in the format of 'U', 'D', 'L', 'R'.
+@:returns - True if the cell has been visited, False if not.
+"""
 
 
 def is_visited(r, c, direction):
@@ -100,8 +138,6 @@ def is_visited(r, c, direction):
             return True
     return False
 
-
-""" This is ICA 6 """
 
 """
 This method receives a coordinate for a maze and a direction
@@ -148,9 +184,15 @@ maze = [[" |", "¯|", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "�
         [" |", "  ", "  ", "  ", "  ", " |", " |", "  ", "  ", " |", " |"],
         [" |", "  ", "  ", "  ", "  ", " |", " |", "  ", "  ", " |", " |"],
         ["¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ "]]
+
 print_maze(maze)
-myBoolean = bfs(9, 10)
-print(myBoolean)
+myBoolean, path, num_of_nodes = bfs(9, 10)
+if myBoolean is True:
+    print("This map is solvable by Breadth First Search!")
+    print("Optimal Path: {0}".format(path))
+    print("Total Number of Nodes Visited: {0}".format(num_of_nodes))
+else:
+    print("This map was NOT solvable by Breadth First Search!")
 
 print()
 wipe_table()
@@ -171,5 +213,10 @@ maze = [[" |", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "�
         ["¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ "]]
 
 print_maze(maze)
-myBoolean = bfs(9, 10)
-print(myBoolean)
+myBoolean, path, num_of_nodes = bfs(9, 10)
+if myBoolean is True:
+    print("This map is solvable by Breadth First Search!")
+    print("Optimal Path: {0}".format(path))
+    print("Total Number of Nodes Visited: {0}".format(num_of_nodes))
+else:
+    print("This map was NOT solvable by Breadth First Search!")
