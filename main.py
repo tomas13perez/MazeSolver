@@ -92,11 +92,48 @@ def bfs(end_row, end_column):
 
 
 # might need recursion for this...
-def dfs(current_node, end_row, end_column):
-    if current_node[0] == end_row and current_node[1] == end_column:
-        return False
+# def dfs(current_node, end_row, end_column):
+#     if current_node[0] == end_row and current_node[1] == end_column:
+#         return True
+#     x, y = current_node[0], current_node[1]
+#     for j in ["L", "R", "U", "D"]:
+#         # FIXME: need to update the coordinates of this when the agent returns...otherwise we always go to start.
+#         temp_x = x
+#         temp_y = y
+#         while reachable((temp_x, temp_y), j):
+#             temp_x, temp_y = update_pos(temp_x, temp_y, j)
+#             visited[temp_x][temp_y] = True
+#     return False
 
-    return False
+def dfs(end_row, end_column):
+    total_nodes_visited = 0
+    optimal_solution = ""
+    row_queue.put(start_position[0])
+    column_queue.put(start_position[1])
+    solution = queue.Queue()
+    solution.put("")
+    found_the_end = False
+    while row_queue.qsize() > 0:
+        temp_path = solution.get()
+        row = row_queue.get()
+        column = column_queue.get()
+        current_position = [row, column]
+        if current_position[0] == end_row and current_position[1] == end_column:
+            found_the_end = True
+            optimal_solution = temp_path
+            return found_the_end, optimal_solution, total_nodes_visited
+        for j in ["L", "R", "U", "D"]:
+            put = temp_path + j
+            while reachable(current_position, j):
+                if is_visited(current_position[0], current_position[1], j) is not True:
+                    solution.put(put)
+                    visited[current_position[0]][current_position[1]] = True
+                    total_nodes_visited += 1
+                    rr, cc = update_pos(current_position[0], current_position[1], j)
+                    row_queue.put(rr)
+                    column_queue.put(cc)
+
+    return found_the_end, optimal_solution, total_nodes_visited
 
 
 """
@@ -207,8 +244,8 @@ else:
 
 print()
 wipe_table()
-myBoolean, path, num_of_nodes = dfs(start_position, 9, 10)
-print()
+myBoolean, path, num_of_nodes = dfs(9, 10)
+print(myBoolean)
 
 """ Dr. Kolta's Maze """
 # 11 x 11 version
