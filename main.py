@@ -1,7 +1,7 @@
 """
 CSC 412
-ICA #3
-2/5/2021
+Assignment #3
+2/17/2021
 
 @author: Tomas Perez
 """
@@ -14,9 +14,9 @@ end_position = [11, 11]
 visited = [[False for i in range(11)] for j in range(11)]
 row_queue = queue.Queue()
 column_queue = queue.Queue()
-stack_row_queue = []
-stack_column_queue = []
-dfs_solution = []
+stack_row_queue = LifoQueue()
+stack_column_queue = LifoQueue()
+dfs_solution = LifoQueue()
 
 """
 This method is responsible for wiping the global variables
@@ -34,11 +34,11 @@ def wipe_table():
     global column_queue
     column_queue = queue.Queue()
     global stack_column_queue
-    stack_column_queue = []
+    stack_column_queue = LifoQueue()
     global stack_row_queue
-    stack_row_queue = []
+    stack_row_queue = LifoQueue()
     global dfs_solution
-    dfs_solution = []
+    dfs_solution = LifoQueue()
 
 
 """
@@ -98,64 +98,46 @@ def bfs(end_row, end_column):
     return found_the_end, optimal_solution, total_nodes_visited
 
 
-# might need recursion for this...
+"""
+This method implements the Depth First Search algorithm by
+keeping track of the current stack of cells that need to
+be searched through, while also keeping track of the most
+optimal path as well as the total amount of nodes searched in.
+@current_node:param - the starting cell.
+@end_row:param - the end row number.
+@end_column:param - the end column number.
+@:returns - True if there is a solution to the maze, False if not,
+            the optimal solution, and the total number of nodes 
+            searched through.
+"""
+
+
 def dfs(current_node, end_row, end_column):
-    if current_node[0] == end_row and current_node[1] == end_column:
-        return True
-    x, y = current_node[0], current_node[1]
-    visited[x][y] = True
-    for j in ["L", "R", "U", "D"]:
-        temp_x = x
-        temp_y = y
-        if is_visited(x, y, j) is not True:
-            while reachable((temp_x, temp_y), j):
-                temp_x, temp_y = update_pos(temp_x, temp_y, j)
-                visited[temp_x][temp_y] = True
-                dfs_solution.append(j)
-                stack_row_queue.append(temp_x)
-                stack_column_queue.append(temp_y)
-                if dfs((temp_x, temp_y), end_row, end_column):
-                    return True
-                dfs_solution.pop()
-                stack_row_queue.pop()
-                stack_column_queue.pop()
+    total_nodes_visited = 0
+    optimal_solution = ""
+    stack_row_queue.put(current_node[0])
+    stack_column_queue.put(current_node[1])
+    dfs_solution.put("")
+    visited[current_node[0]][current_node[1]] = True
+    while stack_row_queue.qsize() > 0:
+        temp_path = dfs_solution.get()
+        x = stack_row_queue.get()
+        y = stack_column_queue.get()
+        for j in ["L", "R", "U", "D"]:
+            put = temp_path + j
+            if reachable((x, y), j):
+                if is_visited(x, y, j) is not True:
+                    temp_x, temp_y = update_pos(x, y, j)
+                    stack_row_queue.put(temp_x)
+                    stack_column_queue.put(temp_y)
+                    visited[temp_x][temp_y] = True
+                    dfs_solution.put(put)
+                    total_nodes_visited += 1
+                    if temp_x == end_row and temp_y == end_column:
+                        optimal_solution = temp_path
+                        return True, total_nodes_visited, optimal_solution
 
     return False
-
-
-# def dfs(end_row, end_column):
-#     total_nodes_visited = 0
-#     optimal_solution = ""
-#     stack_row_queue.append(start_position[0])
-#     stack_column_queue.append(start_position[1])
-#     solution = [""]
-#     found_the_end = False
-#     while stack_row_queue.__sizeof__() > 0:
-#         temp_path = solution.pop()
-#         row = stack_row_queue.pop()
-#         column = stack_column_queue.pop()
-#         current_position = [row, column]
-#         if current_position[0] == end_row and current_position[1] == end_column:
-#             found_the_end = True
-#             optimal_solution = temp_path
-#             return found_the_end, optimal_solution, total_nodes_visited
-#         for j in ["L", "R", "U", "D"]:
-#             if is_visited(current_position[0], current_position[1], j) is not True:
-#                 while reachable(current_position, j):
-#                     solution.append(j)
-#                     visited[current_position[0]][current_position[1]] = True
-#                     total_nodes_visited += 1
-#                     rr, cc = update_pos(current_position[0], current_position[1], j)
-#                     if rr == end_row and cc == end_column:
-#                         found_the_end = True
-#                         optimal_solution = temp_path
-#                         return found_the_end, optimal_solution, total_nodes_visited
-#                     current_position[0] = rr
-#                     current_position[1] = cc
-#                     stack_row_queue.append(current_position[0])
-#                     stack_column_queue.append(current_position[1])
-#
-#     return found_the_end, optimal_solution, total_nodes_visited
 
 
 """
@@ -262,13 +244,18 @@ if myBoolean is True:
     print("Optimal Path: {0}".format(path))
     print("Total Number of Nodes Visited: {0}".format(num_of_nodes))
 else:
-    print("This map was NOT solvable by Breadth First Search!")
+    print("This maze was NOT solvable by Breadth First Search!")
 
 print()
 print()
 wipe_table()
-myBoolean = dfs(start_position, 9, 10)
-print(myBoolean)
+myBoolean, num_of_nodes, path = dfs(start_position, 9, 10)
+if myBoolean is True:
+    print("This map is solvable by Depth First Search!")
+    print("Optimal Path: {0}".format(path))
+    print("Total Number of Nodes Visited: {0}".format(num_of_nodes))
+else:
+    print("This maze was NOT solvable by Depth First Search!")
 print()
 wipe_table()
 
@@ -286,16 +273,21 @@ maze = [[" |", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "�
         [" |", " |", "  ", " |", "  ", " |", "  ", "¯ ", "  ", "¯ ", " |"],
         ["¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ ", "¯ "]]
 
-# print_maze(maze)
-# myBoolean, path, num_of_nodes = bfs(9, 10)
-# if myBoolean is True:
-#     print("This map is solvable by Breadth First Search!")
-#     print("Optimal Path: {0}".format(path))
-#     print("Total Number of Nodes Visited: {0}".format(num_of_nodes))
-# else:
-#     print("This map was NOT solvable by Breadth First Search!")
-#
-# print()
-# wipe_table()
-# myBoolean, path, num_of_nodes = dfs(9, 10)
-# print(myBoolean)
+print_maze(maze)
+myBoolean, path, num_of_nodes = bfs(9, 10)
+if myBoolean is True:
+    print("This map is solvable by Breadth First Search!")
+    print("Optimal Path: {0}".format(path))
+    print("Total Number of Nodes Visited: {0}".format(num_of_nodes))
+else:
+    print("This map was NOT solvable by Breadth First Search!")
+
+print()
+wipe_table()
+myBoolean, num_of_nodes, path = dfs(start_position, 9, 10)
+if myBoolean is True:
+    print("This map is solvable by Depth First Search!")
+    print("Optimal Path: {0}".format(path))
+    print("Total Number of Nodes Visited: {0}".format(num_of_nodes))
+else:
+    print("This maze was NOT solvable by Depth First Search!")
