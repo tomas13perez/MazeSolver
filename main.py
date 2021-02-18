@@ -112,9 +112,13 @@ def dfs(current_node, end_row, end_column):
                 temp_x, temp_y = update_pos(temp_x, temp_y, j)
                 visited[temp_x][temp_y] = True
                 dfs_solution.append(j)
+                stack_row_queue.append(temp_x)
+                stack_column_queue.append(temp_y)
                 if dfs((temp_x, temp_y), end_row, end_column):
                     return True
                 dfs_solution.pop()
+                stack_row_queue.pop()
+                stack_column_queue.pop()
 
     return False
 
@@ -263,7 +267,7 @@ else:
 print()
 print()
 wipe_table()
-myBoolean = dfs(9, 10)
+myBoolean = dfs(start_position, 9, 10)
 print(myBoolean)
 print()
 wipe_table()
